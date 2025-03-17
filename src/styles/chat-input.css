@@ -1,0 +1,146 @@
+.chat-input-container {
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.chat-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-textarea {
+  resize: none;
+  min-height: 80px;
+  font-size: 15px;
+  line-height: 1.5;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.chat-textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+.chat-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.thinking-switch {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.thinking-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  background-color: var(--bg-tertiary);
+  border-radius: 20px;
+  margin-right: 8px;
+  transition: 0.3s;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: var(--text-secondary);
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+input:checked + .switch-slider {
+  background-color: var(--accent-primary);
+}
+
+input:checked + .switch-slider:before {
+  transform: translateX(20px);
+  background-color: white;
+}
+
+.thinking-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+input:checked ~ .thinking-label {
+  color: var(--accent-primary);
+}
+
+.send-button {
+  background-color: var(--accent-primary);
+  color: white;
+  min-width: 100px;
+}
+
+.send-button:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+}
+
+.send-button.streaming {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.stop-button {
+  background-color: var(--error);
+  color: white;
+  min-width: 100px;
+  animation: pulse-attention 2s infinite;
+}
+
+.stop-button:hover {
+  background-color: #d32f2f; /* Darker red */
+}
+
+@keyframes pulse-attention {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chat-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .thinking-switch {
+    margin-bottom: 10px;
+  }
+  
+  .send-button, .stop-button {
+    width: 100%;
+  }
+} 

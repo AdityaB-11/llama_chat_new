@@ -1,0 +1,73 @@
+{
+  "name": "llama-chat",
+  "version": "1.0.0",
+  "description": "Desktop chat application using local Ollama models",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "webpack --mode development --watch & electron .",
+    "build": "webpack --mode production",
+    "package": "electron-builder",
+    "package-win": "webpack --mode production && electron-builder --win",
+    "package-mac": "webpack --mode production && electron-builder --mac",
+    "package-linux": "webpack --mode production && electron-builder --linux",
+    "release": "node scripts/prepare-release.js"
+  },
+  "keywords": [
+    "electron",
+    "ollama",
+    "llm",
+    "chat",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
+    "electron": "^35.0.2",
+    "electron-builder": "^25.1.8",
+    "electron-reload": "^2.0.0-alpha.1",
+    "html-webpack-plugin": "^5.6.3",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.1",
+    "highlight.js": "^11.11.1",
+    "marked": "^15.0.7",
+    "node-fetch": "^2.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^8.0.7"
+  },
+  "build": {
+    "appId": "com.llamachat.app",
+    "productName": "Llama Chat",
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "public/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility"
+    }
+  }
+}
