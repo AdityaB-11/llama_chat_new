@@ -200,33 +200,27 @@ ipcMain.handle('get-models', async () => {
   });
 });
 
-ipcMain.handle('chat-completion', async (event, { model, prompt, systemPrompt, stream, thinking }) => {
-  console.log(`Chat completion request for model: ${model}, thinking: ${thinking}`);
+ipcMain.handle('chat-completion', async (event, { model, prompt, systemPrompt, stream }) => {
+  console.log(`Chat completion request for model: ${model}`);
   
   try {
     // In Ollama, for streaming we need to use a different approach
     if (stream) {
-      // Prepare arguments based on thinking mode
-      // For Ollama the correct order is: 'ollama run [model] [flags]'
-      const args = thinking ? 
-        ['run', model, '--verbose'] : 
-        ['run', model];
+      // Run the model
+      const args = ['run', model];
       
       console.log(`Running ollama with args:`, args);
       
       // Create the chat process
       const chat = spawn('ollama', args, { stdio: ['pipe', 'pipe', 'pipe'] });
       
-      // Update system prompt to control thinking behavior for DeepSeek models
+      // Update system prompt to always filter out thinking blocks for DeepSeek models
       let effectiveSystemPrompt = systemPrompt || '';
       
-      // If it's a DeepSeek model and thinking is disabled, add a system prompt to not show thinking
-      if (model.toLowerCase().includes('deepseek') && !thinking) {
+      // If it's a DeepSeek model, add a system prompt to not show thinking
+      if (model.toLowerCase().includes('deepseek')) {
         effectiveSystemPrompt += effectiveSystemPrompt ? '\n\n' : '';
         effectiveSystemPrompt += 'Respond directly with your answer. Do not use <think> tags or show any thinking process or reasoning steps.';
-      } else if (model.toLowerCase().includes('deepseek') && thinking) {
-        effectiveSystemPrompt += effectiveSystemPrompt ? '\n\n' : '';
-        effectiveSystemPrompt += 'Show your thinking process using <think> tags before providing your final answer.';
       }
       
       // Prepare our input for the model
@@ -273,9 +267,9 @@ ipcMain.handle('chat-completion', async (event, { model, prompt, systemPrompt, s
           const output = data.toString();
           console.log(`ollama stdout (chunk): ${output.length} bytes`);
           
-          // Filter out thinking blocks if it's a DeepSeek model and thinking is disabled
+          // Filter out thinking blocks if it's a DeepSeek model
           let processedOutput = output;
-          if (model.toLowerCase().includes('deepseek') && !thinking) {
+          if (model.toLowerCase().includes('deepseek')) {
             // Skip chunks that are only thinking blocks
             if (output.trim().startsWith('<think>') && output.trim().endsWith('</think>')) {
               console.log('Filtering out thinking block');
@@ -291,13 +285,32 @@ ipcMain.handle('chat-completion', async (event, { model, prompt, systemPrompt, s
             }
           }
           
-          // Try to extract text incrementally
+          // Add to the current response
           currentResponse += processedOutput;
+          
+          // Improved code block formatting logic
+          // Look for incomplete code blocks in the current response
+          let formattedOutput = processedOutput;
+          
+          // Check if we're currently inside a code block by looking at the full accumulated response
+          const codeBlockStarts = (currentResponse.match(/```[a-zA-Z]*/g) || []).length;
+          const codeBlockEnds = (currentResponse.match(/```\s*$/mg) || []).length;
+          const insideCodeBlock = codeBlockStarts > codeBlockEnds;
+          
+          // Special handling for code block start markers
+          if (processedOutput.includes('```') && !insideCodeBlock) {
+            formattedOutput = processedOutput.replace(/```([a-zA-Z]*)\s*$/g, '```$1\n');
+          }
+          
+          // Special handling for code block end markers
+          if (processedOutput.includes('```') && insideCodeBlock) {
+            formattedOutput = processedOutput.replace(/```\s*$/g, '\n```');
+          }
           
           // Send the incremental output to the renderer
           if (mainWindow) {
             mainWindow.webContents.send('chat-response', {
-              response: processedOutput,
+              response: formattedOutput,
               model: model,
               chatId: chatId
             });
@@ -330,22 +343,17 @@ ipcMain.handle('chat-completion', async (event, { model, prompt, systemPrompt, s
       });
     } else {
       // Non-streaming mode follows the same pattern
-      const args = thinking ? 
-        ['run', model, '--verbose'] : 
-        ['run', model];
-        
+      const args = ['run', model];
+      
       const chat = spawn('ollama', args, { stdio: ['pipe', 'pipe', 'pipe'] });
       
       // Update system prompt to control thinking behavior for DeepSeek models
       let effectiveSystemPrompt = systemPrompt || '';
       
       // If it's a DeepSeek model and thinking is disabled, add a system prompt to not show thinking
-      if (model.toLowerCase().includes('deepseek') && !thinking) {
+      if (model.toLowerCase().includes('deepseek')) {
         effectiveSystemPrompt += effectiveSystemPrompt ? '\n\n' : '';
         effectiveSystemPrompt += 'Respond directly with your answer. Do not use <think> tags or show any thinking process or reasoning steps.';
-      } else if (model.toLowerCase().includes('deepseek') && thinking) {
-        effectiveSystemPrompt += effectiveSystemPrompt ? '\n\n' : '';
-        effectiveSystemPrompt += 'Show your thinking process using <think> tags before providing your final answer.';
       }
       
       // Handle errors from the child process
@@ -434,5 +442,19 @@ ipcMain.handle('stop-generation', async (event, { chatId }) => {
   } else {
     console.log(`Chat ${chatId} not found or already completed`);
     return { success: false, error: 'Chat not found' };
+  }
+});
+
+// Add navigation handler
+ipcMain.handle('navigate-to', async (event, { route }) => {
+  console.log(`Navigation request to: ${route}`);
+  
+  try {
+    // Send route change to renderer
+    mainWindow.webContents.send('route-change', route);
+    return { success: true };
+  } catch (error) {
+    console.error('Navigation error:', error);
+    return { success: false, error: error.message };
   }
 }); 

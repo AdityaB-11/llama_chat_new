@@ -25,14 +25,54 @@
   margin-right: auto;
 }
 
-.clear-button {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
+.header-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.clear-button,
+.settings-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3a3a3a;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.clear-button:hover,
+.settings-button:hover {
+  background-color: #4a4a4a;
+}
+
+.clear-button:disabled,
+.settings-button:disabled {
+  background-color: #2a2a2a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.demo-button {
+  background-color: var(--info);
+  color: white;
   white-space: nowrap;
 }
 
-.clear-button:hover:not(:disabled) {
-  background-color: var(--border-color);
+.demo-button:hover {
+  opacity: 0.9;
+}
+
+.test-button {
+  background-color: var(--success);
+  color: white;
+  white-space: nowrap;
+}
+
+.test-button:hover {
+  opacity: 0.9;
 }
 
 .error-banner {
@@ -69,6 +109,32 @@
   opacity: 0.9;
 }
 
+.settings-panel {
+  background-color: #2d2d2d;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 10px 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.settings-panel h2 {
+  font-size: 18px;
+  margin: 0 0 16px 0;
+  color: #f0f0f0;
+  border-bottom: 1px solid #3a3a3a;
+  padding-bottom: 8px;
+}
+
+.settings-section {
+  margin-bottom: 16px;
+}
+
+.settings-section h3 {
+  font-size: 16px;
+  margin: 0 0 8px 0;
+  color: #e0e0e0;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .header {
@@ -82,12 +148,17 @@
     text-align: center;
   }
   
+  .header-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+  
   .model-selector {
     margin-left: 0;
     width: 100%;
   }
   
-  .clear-button {
+  .clear-button, .demo-button, .test-button {
     width: 100%;
     margin-left: 0;
   }

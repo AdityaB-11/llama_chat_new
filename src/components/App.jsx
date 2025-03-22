@@ -17,6 +17,7 @@ const App = () => {
   const [error, setError] = useState(null);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [displayModel, setDisplayModel] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
   
   const removeListenerRef = useRef(null);
   
@@ -116,12 +117,15 @@ const App = () => {
         // Save to chat history
         saveToHistory();
       } else if (response.response) {
+        // Process the response - always remove thought blocks
+        let processedResponse = processThoughtBlocks(response.response);
+        
         // Ignore empty responses (might come from filtering thinking blocks)
-        if (!response.response.trim()) {
+        if (!processedResponse.trim()) {
           return;
         }
         
-        setCurrentStreamedMessage(prev => prev + response.response);
+        setCurrentStreamedMessage(prev => prev + processedResponse);
         
         // Update the streaming message
         setMessages(prev => {
@@ -129,12 +133,12 @@ const App = () => {
           if (newMessages.length > 0 && newMessages[newMessages.length - 1].isStreaming) {
             newMessages[newMessages.length - 1] = {
               ...newMessages[newMessages.length - 1],
-              content: currentStreamedMessage + response.response
+              content: currentStreamedMessage + processedResponse
             };
           } else {
             newMessages.push({
               role: 'assistant',
-              content: currentStreamedMessage + response.response,
+              content: currentStreamedMessage + processedResponse,
               isStreaming: true,
               timestamp: new Date().toISOString()
             });
@@ -215,10 +219,10 @@ const App = () => {
     }
   };
   
-  const handleSendMessage = async (message, thinking = false) => {
+  const handleSendMessage = async (message) => {
     if (!message.trim() || !selectedModel || isStreaming) return;
     
-    console.log(`Sending message to ${selectedModel}, thinking mode: ${thinking}`);
+    console.log(`Sending message to ${selectedModel}`);
     
     const userMessage = {
       role: 'user',
@@ -235,8 +239,7 @@ const App = () => {
       const completion = await window.api.chatCompletion({
         model: selectedModel,
         prompt: message,
-        stream: true,
-        thinking: thinking
+        stream: true
       });
       
       console.log('chatCompletion request completed:', completion);
@@ -358,25 +361,53 @@ const App = () => {
     }
   };
   
+  const toggleSettings = () => {
+    setShowSettings(!showSettings);
+  };
+  
+  // Process thought blocks - always remove them
+  const processThoughtBlocks = (text) => {
+    // Remove content within <thought>...</thought> tags
+    return text.replace(/<thought>[\s\S]*?<\/thought>\n?/g, '');
+  };
+  
   return (
     <div className="app-container">
       <div className="header">
         <h1>Llama Chat</h1>
-        <ModelSelector 
-          models={models} 
-          selectedModel={selectedModel} 
-          onModelChange={handleModelChange}
-          disabled={isStreaming || loadingModels}
-          loading={loadingModels}
-        />
-        <button 
-          className="clear-button"
-          onClick={handleClearConversation}
-          disabled={messages.length === 0 || isStreaming}
-        >
-          Clear Conversation
-        </button>
+        <div className="header-controls">
+          <button 
+            className="clear-button"
+            onClick={handleClearConversation}
+            disabled={messages.length === 0 || isStreaming}
+          >
+            Clear Conversation
+          </button>
+          <button 
+            className="settings-button"
+            onClick={toggleSettings}
+            title="Settings"
+          >
+            ⚙️ Settings
+          </button>
+        </div>
       </div>
+      
+      {showSettings && (
+        <div className="settings-panel">
+          <h2>Settings</h2>
+          <div className="settings-section">
+            <h3>Model Selection</h3>
+            <ModelSelector 
+              models={models} 
+              selectedModel={selectedModel} 
+              onModelChange={handleModelChange}
+              disabled={isStreaming || loadingModels}
+              loading={loadingModels}
+            />
+          </div>
+        </div>
+      )}
       
       {error && (
         <div className="error-banner">

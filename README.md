@@ -14,6 +14,7 @@ A desktop chat application powered by Ollama that lets you interact with local L
 - 🌙 Dark mode interface
 - 📱 Responsive design
 - 💾 Chat history saves automatically per model
+- 💻 Beautiful code formatting with syntax highlighting and copy functionality
 
 ## Prerequisites
 
@@ -62,6 +63,9 @@ npm run dev
 4. **Thinking mode**: Toggle the "Think" switch to see the model's reasoning process (works best with DeepSeek models)
 5. **Stop generation**: Click the "Stop" button to interrupt a response while it's being generated
 6. **Clear conversation**: Click "Clear Conversation" to start a new chat
+7. **Code formatting**: Code blocks in responses are automatically formatted with syntax highlighting and include a copy button
+   * Write code using triple backticks with an optional language identifier: \```javascript\
+   * Inline code is supported using single backticks: \`variable\`
 
 ## Troubleshooting
 

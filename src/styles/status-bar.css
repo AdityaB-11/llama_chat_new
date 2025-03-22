@@ -1,13 +1,12 @@
 .status-bar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 8px 16px;
-  background-color: var(--bg-secondary);
-  border-top: 1px solid var(--border-color);
-  font-size: 12px;
-  color: var(--text-secondary);
-  min-height: 32px;
+  background-color: #2d2d2d;
+  border-top: 1px solid #3a3a3a;
+  color: #e0e0e0;
+  font-size: 14px;
 }
 
 .server-status, .model-status {
@@ -23,31 +22,50 @@
 }
 
 .status-indicator {
-  position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #3a3a3a;
 }
 
-.status-indicator:before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
+.status-indicator.connected {
+  background-color: #2a4a2a;
+  color: #a3ffb0;
 }
 
-.status-indicator.online:before {
-  background-color: var(--success);
+.status-indicator.error {
+  background-color: #4a2a2a;
+  color: #ffb0a3;
 }
 
-.status-indicator.starting:before {
-  background-color: var(--warning);
+.status-indicator.warning {
+  background-color: #4a4a2a;
+  color: #ffecb0;
+}
+
+.status-indicator.starting {
+  background-color: #2a2a4a;
+  color: #b0a3ff;
+}
+
+.status-indicator.loading {
+  background-color: #2a2a4a;
+  color: #b0a3ff;
   animation: pulse 1.5s infinite;
 }
 
-.status-indicator.error:before {
-  background-color: var(--error);
+.status-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.status-extras {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .model-name {
@@ -69,13 +87,13 @@
 
 @keyframes pulse {
   0% {
-    opacity: 0.5;
+    opacity: 0.7;
   }
   50% {
     opacity: 1;
   }
   100% {
-    opacity: 0.5;
+    opacity: 0.7;
   }
 }
 

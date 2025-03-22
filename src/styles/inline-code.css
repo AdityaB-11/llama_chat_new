@@ -1,0 +1,16 @@
+.inline-code {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  background-color: #f3f4f6;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: #e43d59;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .inline-code {
+    background-color: #1f2937;
+    color: #ff9580;
+  }
+} 

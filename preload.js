@@ -54,6 +54,12 @@ contextBridge.exposeInMainWorld('api', {
     }
   },
   
+  // Navigation
+  navigateTo: async (route) => {
+    console.log('navigateTo called with route:', route);
+    return await ipcRenderer.invoke('navigate-to', { route });
+  },
+  
   // Event listeners
   onChatResponse: (callback) => {
     console.log('Setting up onChatResponse listener');
@@ -91,6 +97,19 @@ contextBridge.exposeInMainWorld('api', {
     return () => {
       console.log('Removing onOllamaError listener');
       ipcRenderer.removeListener('ollama-error', subscription);
+    };
+  },
+  
+  onRouteChange: (callback) => {
+    console.log('Setting up onRouteChange listener');
+    const subscription = (event, data) => {
+      console.log('Route change received:', data);
+      callback(data);
+    };
+    ipcRenderer.on('route-change', subscription);
+    return () => {
+      console.log('Removing onRouteChange listener');
+      ipcRenderer.removeListener('route-change', subscription);
     };
   }
 });

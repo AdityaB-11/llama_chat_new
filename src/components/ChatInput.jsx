@@ -13,21 +13,49 @@ const ChatInput = ({ onSendMessage, onStopGeneration, disabled, isStreaming }) =
     }
   };
   
+  const insertCodeBlockTemplate = () => {
+    const codeTemplate = "\n```javascript\n// Your code here\nfunction example() {\n  return 'Hello world!';\n}\n```\n";
+    const textArea = document.querySelector('.chat-textarea');
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    
+    const newMessage = message.substring(0, start) + codeTemplate + message.substring(end);
+    setMessage(newMessage);
+    
+    // Focus back on textarea and set cursor position after the inserted template
+    setTimeout(() => {
+      textArea.focus();
+      const newPosition = start + codeTemplate.length;
+      textArea.setSelectionRange(newPosition, newPosition);
+    }, 0);
+  };
+  
   return (
     <div className="chat-input-container">
       <form onSubmit={handleSubmit} className="chat-form">
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message here..."
-          disabled={disabled || isStreaming}
-          className="chat-textarea"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              handleSubmit(e);
-            }
-          }}
-        />
+        <div className="textarea-container">
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type your message here..."
+            disabled={disabled || isStreaming}
+            className="chat-textarea"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                handleSubmit(e);
+              }
+            }}
+          />
+          <button 
+            type="button" 
+            onClick={insertCodeBlockTemplate}
+            className="code-insert-button"
+            title="Insert code block"
+            disabled={disabled || isStreaming}
+          >
+            &lt;/&gt;
+          </button>
+        </div>
         <div className="chat-controls">
           <label className="thinking-switch">
             <input

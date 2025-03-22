@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
+import MessageContent from './MessageContent';
 import '../styles/message-list.css';
 
 const formatTimestamp = (timestamp) => {
@@ -20,9 +20,7 @@ const Message = ({ message }) => {
           <span className="message-time">{formatTimestamp(timestamp)}</span>
         )}
       </div>
-      <div className="message-content">
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </div>
+      <MessageContent content={content} />
     </div>
   );
 };

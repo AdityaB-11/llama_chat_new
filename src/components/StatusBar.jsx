@@ -1,55 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import '../styles/status-bar.css';
 
 const StatusBar = ({ serverStatus, selectedModel, loading }) => {
-  // State to store the stable model name
-  const [stableModelName, setStableModelName] = useState(selectedModel);
-  
-  // Update stable model name when selectedModel changes and it's not empty
-  useEffect(() => {
-    if (selectedModel) {
-      setStableModelName(selectedModel);
-    }
-  }, [selectedModel]);
-  
-  // Get status text based on server status
   const getStatusText = () => {
-    switch (serverStatus) {
-      case 'online':
-        return 'Online';
-      case 'starting':
-        return 'Starting...';
-      case 'error':
-        return 'Error';
-      default:
-        return 'Unknown';
-    }
+    if (loading) return 'Loading models...';
+    if (serverStatus === 'starting') return 'Starting Ollama server...';
+    if (serverStatus === 'error') return 'Ollama server error';
+    if (!selectedModel) return 'No model selected';
+    return `Model: ${selectedModel}`;
   };
-
+  
+  const getStatusClass = () => {
+    if (loading) return 'loading';
+    if (serverStatus === 'starting') return 'starting';
+    if (serverStatus === 'error') return 'error';
+    if (!selectedModel) return 'warning';
+    return 'connected';
+  };
+  
   return (
     <div className="status-bar">
-      <div className="server-status">
-        <span className="status-label">Server:</span>
-        <span className={`status-indicator ${serverStatus}`}>
-          {getStatusText()}
-        </span>
-      </div>
-      
-      <div className="model-status">
-        {loading ? (
-          <span className="status-label">Loading models...</span>
-        ) : stableModelName ? (
-          <>
-            <span className="status-label">Active Model:</span>
-            <span className="model-name" title={stableModelName}>{stableModelName}</span>
-          </>
-        ) : (
-          <span className="status-label">No model selected</span>
-        )}
-      </div>
-      
-      <div className="app-info">
-        <span>Llama Chat v1.0.0</span>
+      <div className={`status-indicator ${getStatusClass()}`}>
+        <span className="status-text">{getStatusText()}</span>
       </div>
     </div>
   );
